@@ -1,0 +1,883 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>상파울루 남부 단지 카드 (견본)</title><style>/* required styles */
+
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	}
+.leaflet-container {
+	overflow: hidden;
+	}
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+	  -webkit-user-drag: none;
+	}
+/* Prevents IE11 from highlighting tiles in blue */
+.leaflet-tile::selection {
+	background: transparent;
+}
+/* Safari renders non-retina tile on retina better with this, but Chrome is worse */
+.leaflet-safari .leaflet-tile {
+	image-rendering: -webkit-optimize-contrast;
+	}
+/* hack that prevents hw layers "stretching" when loading new tiles */
+.leaflet-safari .leaflet-tile-container {
+	width: 1600px;
+	height: 1600px;
+	-webkit-transform-origin: 0 0;
+	}
+.leaflet-marker-icon,
+.leaflet-marker-shadow {
+	display: block;
+	}
+/* .leaflet-container svg: reset svg max-width decleration shipped in Joomla! (joomla.org) 3.x */
+/* .leaflet-container img: map is broken in FF if you have max-width: 100% on tiles */
+.leaflet-container .leaflet-overlay-pane svg {
+	max-width: none !important;
+	max-height: none !important;
+	}
+.leaflet-container .leaflet-marker-pane img,
+.leaflet-container .leaflet-shadow-pane img,
+.leaflet-container .leaflet-tile-pane img,
+.leaflet-container img.leaflet-image-layer,
+.leaflet-container .leaflet-tile {
+	max-width: none !important;
+	max-height: none !important;
+	width: auto;
+	padding: 0;
+	}
+
+.leaflet-container img.leaflet-tile {
+	/* See: https://bugs.chromium.org/p/chromium/issues/detail?id=600120 */
+	mix-blend-mode: plus-lighter;
+}
+
+.leaflet-container.leaflet-touch-zoom {
+	-ms-touch-action: pan-x pan-y;
+	touch-action: pan-x pan-y;
+	}
+.leaflet-container.leaflet-touch-drag {
+	-ms-touch-action: pinch-zoom;
+	/* Fallback for FF which doesn't support pinch-zoom */
+	touch-action: none;
+	touch-action: pinch-zoom;
+}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom {
+	-ms-touch-action: none;
+	touch-action: none;
+}
+.leaflet-container {
+	-webkit-tap-highlight-color: transparent;
+}
+.leaflet-container a {
+	-webkit-tap-highlight-color: rgba(51, 181, 229, 0.4);
+}
+.leaflet-tile {
+	filter: inherit;
+	visibility: hidden;
+	}
+.leaflet-tile-loaded {
+	visibility: inherit;
+	}
+.leaflet-zoom-box {
+	width: 0;
+	height: 0;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	z-index: 800;
+	}
+/* workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=888319 */
+.leaflet-overlay-pane svg {
+	-moz-user-select: none;
+	}
+
+.leaflet-pane         { z-index: 400; }
+
+.leaflet-tile-pane    { z-index: 200; }
+.leaflet-overlay-pane { z-index: 400; }
+.leaflet-shadow-pane  { z-index: 500; }
+.leaflet-marker-pane  { z-index: 600; }
+.leaflet-tooltip-pane   { z-index: 650; }
+.leaflet-popup-pane   { z-index: 700; }
+
+.leaflet-map-pane canvas { z-index: 100; }
+.leaflet-map-pane svg    { z-index: 200; }
+
+.leaflet-vml-shape {
+	width: 1px;
+	height: 1px;
+	}
+.lvml {
+	behavior: url(#default#VML);
+	display: inline-block;
+	position: absolute;
+	}
+
+
+/* control positioning */
+
+.leaflet-control {
+	position: relative;
+	z-index: 800;
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+.leaflet-top,
+.leaflet-bottom {
+	position: absolute;
+	z-index: 1000;
+	pointer-events: none;
+	}
+.leaflet-top {
+	top: 0;
+	}
+.leaflet-right {
+	right: 0;
+	}
+.leaflet-bottom {
+	bottom: 0;
+	}
+.leaflet-left {
+	left: 0;
+	}
+.leaflet-control {
+	float: left;
+	clear: both;
+	}
+.leaflet-right .leaflet-control {
+	float: right;
+	}
+.leaflet-top .leaflet-control {
+	margin-top: 10px;
+	}
+.leaflet-bottom .leaflet-control {
+	margin-bottom: 10px;
+	}
+.leaflet-left .leaflet-control {
+	margin-left: 10px;
+	}
+.leaflet-right .leaflet-control {
+	margin-right: 10px;
+	}
+
+
+/* zoom and fade animations */
+
+.leaflet-fade-anim .leaflet-popup {
+	opacity: 0;
+	-webkit-transition: opacity 0.2s linear;
+	   -moz-transition: opacity 0.2s linear;
+	        transition: opacity 0.2s linear;
+	}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup {
+	opacity: 1;
+	}
+.leaflet-zoom-animated {
+	-webkit-transform-origin: 0 0;
+	    -ms-transform-origin: 0 0;
+	        transform-origin: 0 0;
+	}
+svg.leaflet-zoom-animated {
+	will-change: transform;
+}
+
+.leaflet-zoom-anim .leaflet-zoom-animated {
+	-webkit-transition: -webkit-transform 0.25s cubic-bezier(0,0,0.25,1);
+	   -moz-transition:    -moz-transform 0.25s cubic-bezier(0,0,0.25,1);
+	        transition:         transform 0.25s cubic-bezier(0,0,0.25,1);
+	}
+.leaflet-zoom-anim .leaflet-tile,
+.leaflet-pan-anim .leaflet-tile {
+	-webkit-transition: none;
+	   -moz-transition: none;
+	        transition: none;
+	}
+
+.leaflet-zoom-anim .leaflet-zoom-hide {
+	visibility: hidden;
+	}
+
+
+/* cursors */
+
+.leaflet-interactive {
+	cursor: pointer;
+	}
+.leaflet-grab {
+	cursor: -webkit-grab;
+	cursor:    -moz-grab;
+	cursor:         grab;
+	}
+.leaflet-crosshair,
+.leaflet-crosshair .leaflet-interactive {
+	cursor: crosshair;
+	}
+.leaflet-popup-pane,
+.leaflet-control {
+	cursor: auto;
+	}
+.leaflet-dragging .leaflet-grab,
+.leaflet-dragging .leaflet-grab .leaflet-interactive,
+.leaflet-dragging .leaflet-marker-draggable {
+	cursor: move;
+	cursor: -webkit-grabbing;
+	cursor:    -moz-grabbing;
+	cursor:         grabbing;
+	}
+
+/* marker & overlays interactivity */
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-image-layer,
+.leaflet-pane > svg path,
+.leaflet-tile-container {
+	pointer-events: none;
+	}
+
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+	pointer-events: visiblePainted; /* IE 9-10 doesn't have auto */
+	pointer-events: auto;
+	}
+
+/* visual tweaks */
+
+.leaflet-container {
+	background: #ddd;
+	outline-offset: 1px;
+	}
+.leaflet-container a {
+	color: #0078A8;
+	}
+.leaflet-zoom-box {
+	border: 2px dotted #38f;
+	background: rgba(255,255,255,0.5);
+	}
+
+
+/* general typography */
+.leaflet-container {
+	font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-size: 0.75rem;
+	line-height: 1.5;
+	}
+
+
+/* general toolbar styles */
+
+.leaflet-bar {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+	border-radius: 4px;
+	}
+.leaflet-bar a {
+	background-color: #fff;
+	border-bottom: 1px solid #ccc;
+	width: 26px;
+	height: 26px;
+	line-height: 26px;
+	display: block;
+	text-align: center;
+	text-decoration: none;
+	color: black;
+	}
+.leaflet-bar a,
+.leaflet-control-layers-toggle {
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	display: block;
+	}
+.leaflet-bar a:hover,
+.leaflet-bar a:focus {
+	background-color: #f4f4f4;
+	}
+.leaflet-bar a:first-child {
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	}
+.leaflet-bar a:last-child {
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	border-bottom: none;
+	}
+.leaflet-bar a.leaflet-disabled {
+	cursor: default;
+	background-color: #f4f4f4;
+	color: #bbb;
+	}
+
+.leaflet-touch .leaflet-bar a {
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
+	}
+.leaflet-touch .leaflet-bar a:first-child {
+	border-top-left-radius: 2px;
+	border-top-right-radius: 2px;
+	}
+.leaflet-touch .leaflet-bar a:last-child {
+	border-bottom-left-radius: 2px;
+	border-bottom-right-radius: 2px;
+	}
+
+/* zoom control */
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+	font: bold 18px 'Lucida Console', Monaco, monospace;
+	text-indent: 1px;
+	}
+
+.leaflet-touch .leaflet-control-zoom-in, .leaflet-touch .leaflet-control-zoom-out  {
+	font-size: 22px;
+	}
+
+
+/* layers control */
+
+.leaflet-control-layers {
+	box-shadow: 0 1px 5px rgba(0,0,0,0.4);
+	background: #fff;
+	border-radius: 5px;
+	}
+.leaflet-control-layers-toggle {
+	background-image: url(images/layers.png);
+	width: 36px;
+	height: 36px;
+	}
+.leaflet-retina .leaflet-control-layers-toggle {
+	background-image: url(images/layers-2x.png);
+	background-size: 26px 26px;
+	}
+.leaflet-touch .leaflet-control-layers-toggle {
+	width: 44px;
+	height: 44px;
+	}
+.leaflet-control-layers .leaflet-control-layers-list,
+.leaflet-control-layers-expanded .leaflet-control-layers-toggle {
+	display: none;
+	}
+.leaflet-control-layers-expanded .leaflet-control-layers-list {
+	display: block;
+	position: relative;
+	}
+.leaflet-control-layers-expanded {
+	padding: 6px 10px 6px 6px;
+	color: #333;
+	background: #fff;
+	}
+.leaflet-control-layers-scrollbar {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	padding-right: 5px;
+	}
+.leaflet-control-layers-selector {
+	margin-top: 2px;
+	position: relative;
+	top: 1px;
+	}
+.leaflet-control-layers label {
+	display: block;
+	font-size: 13px;
+	font-size: 1.08333em;
+	}
+.leaflet-control-layers-separator {
+	height: 0;
+	border-top: 1px solid #ddd;
+	margin: 5px -10px 5px -6px;
+	}
+
+/* Default icon URLs */
+.leaflet-default-icon-path { /* used only in path-guessing heuristic, see L.Icon.Default */
+	background-image: url(images/marker-icon.png);
+	}
+
+
+/* attribution and scale controls */
+
+.leaflet-container .leaflet-control-attribution {
+	background: #fff;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 0;
+	}
+.leaflet-control-attribution,
+.leaflet-control-scale-line {
+	padding: 0 5px;
+	color: #333;
+	line-height: 1.4;
+	}
+.leaflet-control-attribution a {
+	text-decoration: none;
+	}
+.leaflet-control-attribution a:hover,
+.leaflet-control-attribution a:focus {
+	text-decoration: underline;
+	}
+.leaflet-attribution-flag {
+	display: inline !important;
+	vertical-align: baseline !important;
+	width: 1em;
+	height: 0.6669em;
+	}
+.leaflet-left .leaflet-control-scale {
+	margin-left: 5px;
+	}
+.leaflet-bottom .leaflet-control-scale {
+	margin-bottom: 5px;
+	}
+.leaflet-control-scale-line {
+	border: 2px solid #777;
+	border-top: none;
+	line-height: 1.1;
+	padding: 2px 5px 1px;
+	white-space: nowrap;
+	-moz-box-sizing: border-box;
+	     box-sizing: border-box;
+	background: rgba(255, 255, 255, 0.8);
+	text-shadow: 1px 1px #fff;
+	}
+.leaflet-control-scale-line:not(:first-child) {
+	border-top: 2px solid #777;
+	border-bottom: none;
+	margin-top: -2px;
+	}
+.leaflet-control-scale-line:not(:first-child):not(:last-child) {
+	border-bottom: 2px solid #777;
+	}
+
+.leaflet-touch .leaflet-control-attribution,
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	box-shadow: none;
+	}
+.leaflet-touch .leaflet-control-layers,
+.leaflet-touch .leaflet-bar {
+	border: 2px solid rgba(0,0,0,0.2);
+	background-clip: padding-box;
+	}
+
+
+/* popup */
+
+.leaflet-popup {
+	position: absolute;
+	text-align: center;
+	margin-bottom: 20px;
+	}
+.leaflet-popup-content-wrapper {
+	padding: 1px;
+	text-align: left;
+	border-radius: 12px;
+	}
+.leaflet-popup-content {
+	margin: 13px 24px 13px 20px;
+	line-height: 1.3;
+	font-size: 13px;
+	font-size: 1.08333em;
+	min-height: 1px;
+	}
+.leaflet-popup-content p {
+	margin: 17px 0;
+	margin: 1.3em 0;
+	}
+.leaflet-popup-tip-container {
+	width: 40px;
+	height: 20px;
+	position: absolute;
+	left: 50%;
+	margin-top: -1px;
+	margin-left: -20px;
+	overflow: hidden;
+	pointer-events: none;
+	}
+.leaflet-popup-tip {
+	width: 17px;
+	height: 17px;
+	padding: 1px;
+
+	margin: -10px auto 0;
+	pointer-events: auto;
+
+	-webkit-transform: rotate(45deg);
+	   -moz-transform: rotate(45deg);
+	    -ms-transform: rotate(45deg);
+	        transform: rotate(45deg);
+	}
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+	background: white;
+	color: #333;
+	box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+	}
+.leaflet-container a.leaflet-popup-close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: none;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	font: 16px/24px Tahoma, Verdana, sans-serif;
+	color: #757575;
+	text-decoration: none;
+	background: transparent;
+	}
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus {
+	color: #585858;
+	}
+.leaflet-popup-scrolled {
+	overflow: auto;
+	}
+
+.leaflet-oldie .leaflet-popup-content-wrapper {
+	-ms-zoom: 1;
+	}
+.leaflet-oldie .leaflet-popup-tip {
+	width: 24px;
+	margin: 0 auto;
+
+	-ms-filter: "progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678)";
+	filter: progid:DXImageTransform.Microsoft.Matrix(M11=0.70710678, M12=0.70710678, M21=-0.70710678, M22=0.70710678);
+	}
+
+.leaflet-oldie .leaflet-control-zoom,
+.leaflet-oldie .leaflet-control-layers,
+.leaflet-oldie .leaflet-popup-content-wrapper,
+.leaflet-oldie .leaflet-popup-tip {
+	border: 1px solid #999;
+	}
+
+
+/* div icon */
+
+.leaflet-div-icon {
+	background: #fff;
+	border: 1px solid #666;
+	}
+
+
+/* Tooltip */
+/* Base styles for the element that has a tooltip */
+.leaflet-tooltip {
+	position: absolute;
+	padding: 6px;
+	background-color: #fff;
+	border: 1px solid #fff;
+	border-radius: 3px;
+	color: #222;
+	white-space: nowrap;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	pointer-events: none;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+	}
+.leaflet-tooltip.leaflet-interactive {
+	cursor: pointer;
+	pointer-events: auto;
+	}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	position: absolute;
+	pointer-events: none;
+	border: 6px solid transparent;
+	background: transparent;
+	content: "";
+	}
+
+/* Directions */
+
+.leaflet-tooltip-bottom {
+	margin-top: 6px;
+}
+.leaflet-tooltip-top {
+	margin-top: -6px;
+}
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-top:before {
+	left: 50%;
+	margin-left: -6px;
+	}
+.leaflet-tooltip-top:before {
+	bottom: 0;
+	margin-bottom: -12px;
+	border-top-color: #fff;
+	}
+.leaflet-tooltip-bottom:before {
+	top: 0;
+	margin-top: -12px;
+	margin-left: -6px;
+	border-bottom-color: #fff;
+	}
+.leaflet-tooltip-left {
+	margin-left: -6px;
+}
+.leaflet-tooltip-right {
+	margin-left: 6px;
+}
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+	top: 50%;
+	margin-top: -6px;
+	}
+.leaflet-tooltip-left:before {
+	right: 0;
+	margin-right: -12px;
+	border-left-color: #fff;
+	}
+.leaflet-tooltip-right:before {
+	left: 0;
+	margin-left: -12px;
+	border-right-color: #fff;
+	}
+
+/* Printing */
+
+@media print {
+	/* Prevent printers from removing background-images of controls. */
+	.leaflet-control {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+		}
+	}
+</style><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script></head><body><style>
+:root{--ink:#1d2433;--sub:#5d6678;--line:#e6e8ee;--bg:#f6f7f9;--acc:#2f5bd3;--ok:#1f8a4c;--warn:#c56a12}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:system-ui,-apple-system,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;color:var(--ink);-webkit-tap-highlight-color:transparent}
+#map{position:fixed;inset:0;background:#e4e0d7}
+#about{position:fixed;inset:0;z-index:2000;background:rgba(20,26,38,.45);display:none;align-items:flex-end;justify-content:center}#about.on{display:flex}#about .box{background:#fff;width:100%;max-width:520px;max-height:84vh;overflow:auto;border-radius:18px 18px 0 0;padding:20px 20px 28px;font-size:13.5px;line-height:1.6;color:#2a3140}@media(min-width:900px){#about{align-items:center}#about .box{border-radius:16px}}#about h3{margin:14px 0 6px;font-size:14px}#about h2{margin:0 0 6px;font-size:17px}#about ul{margin:0;padding-left:18px}#about li{margin:3px 0}#about .x{float:right;border:0;background:#f0f2f5;border-radius:10px;padding:6px 12px;font-size:13px}.leaflet-control-attribution{font-size:10.5px!important}.leaflet-control-attribution a#srcln{font-weight:700;color:#2b5bb8}
+#top{position:fixed;z-index:1000;left:10px;right:10px;top:10px;display:flex;gap:8px}
+#sbox{flex:1;display:flex;align-items:center;background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:0 12px;height:46px}
+#sbox input{flex:1;border:0;outline:0;font-size:16px;background:transparent}
+#sbox .cnt{font-size:12px;color:var(--sub);white-space:nowrap}
+.iconbtn{height:46px;min-width:46px;border:0;border-radius:14px;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.15);font-size:14px;font-weight:600;color:var(--ink);padding:0 12px}
+.iconbtn.on{background:var(--acc);color:#fff}
+#legend{position:fixed;z-index:900;left:10px;top:64px;background:rgba(255,255,255,.95);border-radius:10px;padding:6px 8px;font-size:11px;color:var(--sub);box-shadow:0 1px 6px rgba(0,0,0,.12)}
+#legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin:0 3px 0 6px;vertical-align:-1px}
+#legend select{border:0;background:#eef1f6;border-radius:8px;font-size:11px;font-weight:600;padding:3px 4px;margin-right:4px;color:var(--ink)}#legend button{border:0;background:none;color:var(--acc);font-size:11px;padding:0 0 0 6px}
+#listbtn{position:fixed;z-index:900;right:12px;bottom:24px;height:44px;border:0;border-radius:22px;background:var(--ink);color:#fff;font-size:14px;font-weight:600;padding:0 18px;box-shadow:0 3px 12px rgba(0,0,0,.25)}
+#sheet{position:fixed;z-index:1100;left:0;right:0;bottom:0;background:#fff;border-radius:18px 18px 0 0;box-shadow:0 -4px 20px rgba(0,0,0,.18);transform:translateY(100%);transition:transform .25s ease;max-height:88vh;display:flex;flex-direction:column}
+#sheet.peek{transform:translateY(calc(100% - 210px))}#sheet.full{transform:translateY(0)}
+#grab{padding:8px 0 4px;cursor:grab;touch-action:none}#grab i{display:block;width:40px;height:5px;border-radius:3px;background:#cfd3db;margin:0 auto}
+#shead{display:flex;align-items:center;gap:8px;padding:0 16px 6px}
+#shead b{flex:1;font-size:13px;color:var(--sub);font-weight:600}
+#shead button{border:0;background:var(--bg);border-radius:10px;padding:6px 10px;font-size:13px}
+#sbody{overflow:auto;padding:0 16px 24px;-webkit-overflow-scrolling:touch}
+.it{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.it .dot{width:10px;height:10px;border-radius:3px;margin-top:5px;flex:none}
+.it .t{font-weight:650;font-size:15px}.it .s{font-size:12px;color:var(--sub);margin-top:2px}
+h2.nm{font-size:20px;margin:2px 0 2px;line-height:1.25}.addr{font-size:13px;color:var(--sub)}
+.badge{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;margin:6px 0 2px}
+.b-ok{background:#e4f5ea;color:var(--ok)}.b-2{background:#e7edfb;color:var(--acc)}.b-1{background:#eef0f3;color:var(--sub)}.b-x{background:#fdeedd;color:var(--warn)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.stats div{background:var(--bg);border-radius:12px;padding:8px 6px;text-align:center}
+.stats b{display:block;font-size:17px}.stats span{font-size:11px;color:var(--sub)}
+.sec{margin:16px 0 6px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;align-items:baseline}
+.sec small{font-weight:400;color:var(--sub);font-size:11px}
+.ty{display:grid;grid-template-columns:92px 1fr 56px;align-items:center;gap:8px;font-size:13px;padding:4px 0}
+.ty .bar{height:10px;border-radius:5px;background:#e9edf6;overflow:hidden}.ty .bar i{display:block;height:100%;background:var(--acc);border-radius:5px}
+.ty .n{text-align:right;color:var(--sub);font-size:12px}
+.note{font-size:11px;color:#8a92a3;line-height:1.5}
+details{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0}summary{font-size:13px;font-weight:600;cursor:pointer}
+table.tw{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}table.tw td,table.tw th{padding:5px 4px;border-bottom:1px solid var(--line);text-align:left}table.tw th{color:var(--sub);font-weight:500}
+.todo{display:flex;flex-wrap:wrap;gap:6px}.todo span{font-size:12px;border:1px dashed #c9ced8;color:var(--sub);border-radius:999px;padding:4px 10px}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--line)}.kv span:first-child{color:var(--sub)}
+table.ug{border-collapse:separate;border-spacing:3px;font-size:10px}table.ug td{text-align:center;border-radius:6px;padding:3px 2px;min-width:46px;line-height:1.25}table.ug td.fl{background:none;color:var(--sub);min-width:28px;text-align:right;padding-right:4px}table.ug td.e{background:#f3f4f6}.ugw{overflow-x:auto;margin:6px -4px}.tt{width:100%;border-collapse:collapse;font-size:13px}.tt td,.tt th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:right}.tt th{color:var(--sub);font-weight:500;font-size:11px}.tt td:first-child,.tt th:first-child{text-align:left}
+.plan svg{width:100%;height:auto;border-radius:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 12px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 12px;font-size:13px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.rs{position:relative;height:30px;margin:2px 6px 6px}.rs .rtrack{position:absolute;left:0;right:0;top:13px;height:4px;border-radius:2px;background:#e3e6ec}.rs .rtrack i{position:absolute;top:0;bottom:0;background:var(--ink);border-radius:2px}
+.rs input{position:absolute;left:-8px;right:-8px;width:calc(100% + 16px);top:4px;margin:0;height:22px;background:none;pointer-events:none;-webkit-appearance:none;appearance:none}
+.rs input::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer}
+.rs input::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid var(--ink);cursor:pointer}.rs input::-moz-range-track{background:none}
+.rv{float:right;font-weight:700;color:var(--ink);font-size:12px}.chip small{color:#8a92a3;margin-left:2px}.chip.on small{color:#cfd5e0}
+.flab{font-size:12px;color:var(--sub);margin-top:10px}
+.rl span{position:absolute;white-space:nowrap;font-size:10px;letter-spacing:.2px;color:#8b8577;text-shadow:0 0 2px #fff,0 0 3px #fff;pointer-events:none}.rl span.mj{font-size:11px;font-weight:600;color:#9a7a3f}
+.cshadow{filter:drop-shadow(0 1px 1.2px rgba(25,35,55,.28))}.condo{transition:fill-opacity .15s}.condo:hover{fill-opacity:.95}.condo.sel{filter:drop-shadow(0 0 5px rgba(232,93,52,.75))}.bld{}.leaflet-qp-pane canvas,.leaflet-rp-pane canvas,.leaflet-bp-pane canvas{pointer-events:none!important}.adm{pointer-events:none;white-space:nowrap;transform:translate(-50%,-50%);font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#4b5263;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 4px #fff}.adm.d{font-size:12px}.adm.s{font-size:10px;color:#8a6d3b;letter-spacing:2px}.bnl{pointer-events:none;white-space:nowrap;transform:translate(-50%,-50%);font-size:11.5px;font-weight:600;font-style:italic;letter-spacing:.6px;color:#5a6b8c;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff}
+.clb{position:absolute;transform:translate(-50%,-50%);background:rgba(255,255,255,.96);border-radius:999px;box-shadow:0 1px 4px rgba(20,30,50,.22);font-size:11px;font-weight:650;color:#1d2433;padding:2px 9px 2px 7px;white-space:nowrap;pointer-events:none}.clb i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px}
+.leaflet-tooltip.lbl{background:rgba(255,255,255,.96);border:0;border-radius:999px;box-shadow:0 1px 4px rgba(20,30,50,.22);font-size:11px;font-weight:650;color:#1d2433;padding:2px 9px 2px 7px;white-space:nowrap}.leaflet-tooltip.lbl i{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:0}
+.leaflet-tooltip.lbl:before{display:none}
+@media(min-width:900px){
+ #top{left:12px;right:auto;width:396px}#legend{left:430px;top:12px}
+ #sheet{left:12px;right:auto;top:68px;bottom:12px;width:396px;border-radius:16px;max-height:none;transform:none!important;box-shadow:0 2px 14px rgba(0,0,0,.15)}
+ #grab{display:none}#listbtn{display:none}#shead{padding-top:12px}
+ #sheet:not(.full):not(.peek){transform:translateX(-115%)!important;box-shadow:none}body.shid #listbtn{display:block;left:12px;right:auto;top:68px;bottom:auto}
+}
+</style>
+<div id="map"></div>
+<div id="about"><div class="box"><button class="x" id="abx">닫기</button><h2>자료 출처 · 이용 안내</h2>
+<p>상파울루 남부·서부 11개 구의 아파트 단지 8,629곳을 공개 자료로 정리한 <b>참고용 지도</b>입니다. 계약·투자 판단 전에는 등기부(matrícula), 관리사무소, 중개인을 통해 꼭 직접 확인하세요. 정확성을 보장하지 않습니다.</p>
+<h3>자료 출처</h3><ul>
+<li><b>단지 기본정보</b> (주소·준공연도·세대수·층수·대지면적·호실별 면적·건물등급): 상파울루시 재산세(IPTU) 대장 2026년판, GeoSampa 공개자료 (Decreto 56.701/2015)</li>
+<li><b>필지·건물 윤곽·도로·행정구역</b>: 상파울루시 GeoSampa</li>
+<li><b>단지 이름</b>: 부동산 사이트 단지 목록, 시청 대장 표기, OpenStreetMap. 단지마다 출처와 확인 여부를 표시합니다.</li>
+<li>지도 데이터 일부 © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap 기여자</a>, ODbL 라이선스</li></ul>
+<h3>알아 두실 점</h3><ul>
+<li>대장 면적은 전용면적에 공용부분 지분이 더해진 값이라 전용면적과 다릅니다.</li>
+<li>동 배치는 시청 건물 윤곽(2007년 촬영·2014년 갱신) 기준이라 이후 지어진 건물은 빠지거나 다를 수 있습니다.</li>
+<li>동네 이름은 공식 경계가 아니라 재산세 대장의 주소 표기 기준입니다.</li>
+<li>이 지도는 상파울루시나 부동산 사이트와 관계없는 개인 프로젝트입니다.</li></ul>
+<h3>틀린 정보 제보</h3><p>제보 기능은 준비 중입니다.</p></div></div>
+<div id="top"><div id="sbox"><input id="q" placeholder="단지명 · 주소 검색" autocomplete="off"><span class="cnt" id="cnt"></span></div><button class="iconbtn" id="fbtn">필터</button></div>
+<div id="legend"></div>
+<button id="listbtn">목록 보기</button>
+<div id="sheet" class="peek"><div id="grab"><i></i></div><div id="shead"><button id="back" style="display:none">← 목록</button><b id="stitle">단지 목록</b><button id="close">닫기</button></div><div id="sbody"></div></div>
+<script>(async()=>{
+const r=await Promise.all([fetch('condos.json').then(x=>x.json()),fetch('admin.json').then(x=>x.json())]);{const KM=r[0].KM||{};const ex=p=>{const q={};for(const k in p)q[KM[k]||k]=p[k];return q};r[0].gj.features.forEach(f=>{f.type='Feature';f.properties=ex(f.properties)});r[0].nop=(r[0].nop||[]).map(ex)}const AD=r[1],DM=r[0].D;const RD={n:{}};
+const LY={lay:{},bad:{}},GJ=r[0].gj,NOP=Array.isArray(r[0].nop)?r[0].nop:[];const GEO={};GJ.features.forEach(f=>GEO[f.properties.k]=f.geometry);
+const ALL=GJ.features.map(f=>f.properties).concat(NOP);const fmt=n=>Number(n).toLocaleString('ko-KR');const Y=new Date().getFullYear();
+const $=id=>document.getElementById(id);const fA=v=>!v?'-':v>=10000?(v/10000).toFixed(1)+'만㎡':Number(v).toLocaleString('ko-KR')+'㎡';
+const PAD={B:'보급형',C:'일반',D:'중상급',E:'고급',F:'최고급'};const pad=p=>{const m=/padrão ([A-F])/.exec(p.padrao||'');return m?m[1]:'-'};
+const conf=p=>{const s=p.nome_src||'';if(!p.nome)return['b-1','이름 미확인'];if(s.includes('직접'))return['b-ok','✓ 직접 확인'];if(s.includes('불일치'))return['b-x','출처끼리 이름이 다름'];if(s.includes('일치'))return['b-2',((s.match(/(\d)개 출처 일치/)||[0,2])[1])+'개 출처 일치'];return['b-1','출처 1곳 · 미확인']};
+const MODES={ano:{t:'준공',c:[[0,'#d8d1c3','~1979'],[1980,'#a9c7bf','80~90년대'],[2000,'#5f9aa6','2000~14'],[2015,'#2b4a74','2015~']],v:p=>p.ano},
+padrao:{t:'등급',c:[[0,'#e6dccb','B'],[1,'#c3d4cc','C'],[2,'#86aeb0','D'],[3,'#4c7a92','E'],[4,'#26385f','F']],v:p=>'BCDEF'.indexOf(pad(p))},
+unidades:{t:'세대수',c:[[0,'#e6dccb','~49'],[50,'#c3d4cc','50~149'],[150,'#86aeb0','150~299'],[300,'#4c7a92','300~599'],[600,'#26385f','600+']],v:p=>p.unidades},
+terreno:{t:'대지면적',c:[[0,'#e6dccb','~2천㎡'],[2000,'#c3d4cc','2~5천'],[5000,'#86aeb0','5천~1만'],[10000,'#4c7a92','1~2만'],[20000,'#26385f','2만㎡+']],v:p=>p.terreno||0}};
+let mode='ano';const col=p=>{const M=MODES[mode];let c=M.c[0][1];for(const x of M.c)if(M.v(p)>=x[0])c=x[1];return c};
+function legend(){const M=MODES[mode];$('legend').innerHTML=`<select id="lgsw">${Object.entries(MODES).map(([k,v])=>`<option value="${k}" ${k===mode?'selected':''}>색상: ${v.t}</option>`).join('')}</select>`+M.c.map(c=>`<span class="sw" style="background:${c[1]}"></span>${c[2]}`).join('');$('lgsw').onchange=e=>{mode=e.target.value;legend();restyle();labels();if(view==='list')listView()}}
+const map=L.map('map',{zoomControl:false,preferCanvas:true,markerZoomAnimation:false,fadeAnimation:false});map.attributionControl.setPrefix(false);map.attributionControl.addAttribution('<a href="#" id="srcln">참고용 · 자료 출처</a> · GeoSampa · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>');document.addEventListener('click',e=>{if(e.target.id==='srcln'||e.target.classList.contains('srcl')){e.preventDefault();$('about').classList.add('on')}else if(e.target.id==='abx'||e.target.id==='about')$('about').classList.remove('on')});L.control.zoom({position:innerWidth>=900?'bottomright':'bottomleft'}).addTo(map);
+['qp','rp','bp'].forEach((n,i)=>{const p=map.createPane(n);p.style.zIndex=[350,360,420][i];p.style.pointerEvents='none'});const QR=L.canvas({pane:'qp',padding:.5}),RR=L.canvas({pane:'rp',padding:.5});const QL=L.layerGroup().addTo(map);
+const rdCas=L.layerGroup(),rdTop=L.layerGroup();const rdL=L.layerGroup([rdCas,rdTop]);
+const RL=L.layerGroup().addTo(map);const RLAB=[];
+
+function roadLabels(){const z=map.getZoom();z>=15?rdL.addTo(map):rdL.remove();RL.clearLayers();if(z<16)return;const vb=map.getBounds();for(const r of RLAB){if(!(r.mj||z>=17))continue;if(!vb.contains(r.ll))continue;L.marker(r.ll,{interactive:false,keyboard:false,icon:L.divIcon({className:'rl',iconSize:[0,0],html:`<span class="${r.mj?'mj':''}" style="transform:translate(-50%,-50%) rotate(${r.a}deg)">${r.n}</span>`})}).addTo(RL)}}
+
+const admD=L.geoJSON({type:'FeatureCollection',features:AD.d.map(x=>({type:'Feature',properties:{n:x.n},geometry:x.g}))},{interactive:false,style:{color:'#5b6475',weight:1.4,dashArray:'5 4',fill:false,opacity:.8}});
+const admS=L.geoJSON({type:'FeatureCollection',features:AD.s.map(x=>({type:'Feature',properties:{n:x.n},geometry:x.g}))},{interactive:false,style:{color:'#b08a4a',weight:2.4,fill:false,opacity:.55}});
+const admDL=L.layerGroup(AD.d.map(x=>L.marker(x.c,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="adm d">${x.n}</div>`})})));
+const admSL=L.layerGroup(AD.s.map(x=>L.marker(x.c,{interactive:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="adm s">Subpref. ${x.n}</div>`})})));
+function adm(){const z=map.getZoom();const on=z<=14;[admD,admDL].forEach(l=>on?l.addTo(map):l.remove());[admS,admSL].forEach(l=>z<=12?l.addTo(map):l.remove())}
+map.on('zoomend',adm);
+const LOADED={},LOADING={};
+async function loadDist(d){const m=DM[d];if(!m||LOADED[d])return;if(LOADING[d])return LOADING[d];LOADING[d]=(async()=>{const s=m.s;const [q,rd,ly]=await Promise.all(['q_','r_','l_'].map(p=>fetch(p+s+'.json').then(x=>x.json())));
+ L.geoJSON({type:'FeatureCollection',features:q.map(g=>({type:'Feature',properties:{},geometry:g}))},{renderer:QR,style:{stroke:false,fillColor:'#f8f6f1',fillOpacity:1},interactive:false}).addTo(QL);
+ rd.g.forEach(g=>{if(g[1])L.polyline(g[2],{renderer:RR,color:'#e6d3a8',weight:8,opacity:1,interactive:false}).addTo(rdCas);L.polyline(g[2],{renderer:RR,color:g[1]?'#fbecc9':'#ffffff',weight:g[1]?6:3,opacity:1,lineCap:'round',lineJoin:'round',interactive:false}).addTo(rdTop)});
+ Object.assign(RD.n,rd.n);rd.l.forEach(l=>{const n=rd.n[l[3]];if(n)RLAB.push({ll:L.latLng(l[0],l[1]),a:l[2],n:n[0],mj:n[1]})});
+ Object.assign(LY.lay,ly.lay);Object.assign(LY.bad,ly.bad);Object.entries(ly.lay).forEach(e=>BB.push(bbOf(e)));LOADED[d]=1;rdCas.eachLayer(x=>x.bringToBack())})();return LOADING[d]}
+function ensure(){const vb=map.getBounds().pad(.3);return Promise.all(Object.entries(DM).filter(([d,m])=>m.b&&vb.intersects(L.latLngBounds([m.b[1],m.b[0]],[m.b[3],m.b[2]]))).map(([d])=>loadDist(d)))}
+const layers={};let sel=null;
+const shade=(h,f)=>{const n=parseInt(h.slice(1),16);const c=[n>>16,n>>8&255,n&255].map(v=>Math.round(v*f));return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('')};
+const base=p=>({color:shade(col(p),.62),weight:1.2,fillColor:col(p),fillOpacity:.78,lineJoin:'round',className:'condo'});
+const CR=L.canvas({padding:.5,tolerance:4});const BR=L.canvas({pane:'bp',padding:.5});const PK={};ALL.forEach(p=>PK[p.k]=p);
+const bldL=L.layerGroup();const BB=[];const bbOf=([k,B])=>{let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;B.forEach(b=>b.g.forEach(c=>{x0=Math.min(x0,c[0]);x1=Math.max(x1,c[0]);y0=Math.min(y0,c[1]);y1=Math.max(y1,c[1])}));return [k,B,L.latLngBounds([y0,x0],[y1,x1])]};
+function blds(){bldL.clearLayers();if(map.getZoom()<16){bldL.remove();return}const vb=map.getBounds().pad(.2);for(const [k,B,bb] of BB){if(!vb.intersects(bb))continue;const P=PK[k];const th=Math.max(9,(P?P.pav_max:3)*1.35);B.forEach(b=>L.polygon(b.g.map(c=>[c[1],c[0]]),{renderer:BR,interactive:false,color:b.h>=th?'#1b2a44':'#9aa3b2',weight:.6,fillColor:b.h>=th?'#243a5e':'#ffffff',fillOpacity:b.h>=th?.82:.7,className:'bld'}).addTo(bldL))}bldL.addTo(map)}
+
+const lay=L.geoJSON(GJ,{renderer:CR,style:f=>base(f.properties),onEachFeature:(f,l)=>{layers[f.properties.k]=l;l.on('click',()=>openCard(f.properties.k,false));}}).addTo(map);
+map.fitBounds(lay.getBounds());adm();ensure().then(()=>{roadLabels();blds();bLabels()});
+const CL=L.layerGroup().addTo(map);const CC={};GJ.features.forEach(f=>{if(f.properties.nome){const l=layers[f.properties.k];CC[f.properties.k]=l.getBounds().getCenter()}});
+function labels(){CL.clearLayers();const z=map.getZoom();if(z<16)return;const vb=map.getBounds();const acc=[];const cand=ALL.filter(p=>CC[p.k]&&shown.has(p.k)&&(z>=17||p.unidades>=150)&&vb.contains(CC[p.k])).sort((a,b)=>b.unidades-a.unidades);
+ for(const p of cand){const nm=p.nome.replace(/^(Condom[ií]nio|Edif[ií]cio)\s+/i,'');const pt=map.latLngToContainerPoint(CC[p.k]);const w=nm.length*6.4+26,h=20;const r={l:pt.x-w/2,r:pt.x+w/2,t:pt.y-h/2,b:pt.y+h/2};if(acc.some(q=>r.l<q.r+4&&r.r>q.l-4&&r.t<q.b+2&&r.b>q.t-2))continue;acc.push(r);
+ L.marker(CC[p.k],{interactive:false,keyboard:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="clb"><i style="background:${col(p)}"></i>${nm}</div>`})}).addTo(CL)}}
+const BNG=(()=>{const g={};ALL.forEach(p=>{if(!p.bn)return;let ll=CC[p.k];if(!ll&&p.lat)ll={lat:+p.lat,lng:+p.lon};if(!ll)return;(g[p.dist+'|'+p.bn]=g[p.dist+'|'+p.bn]||{n:p.bn,a:[],o:[]}).a.push(ll.lat),g[p.dist+'|'+p.bn].o.push(ll.lng)});const md=a=>{a.sort((x,y)=>x-y);return a[a.length>>1]};const m={};Object.values(g).forEach(x=>{if(x.a.length<3)return;const key=x.n;(m[key]=m[key]||[]).push({n:x.n,c:x.a.length,ll:L.latLng(md(x.a),md(x.o))})});const out=[];Object.values(m).forEach(arr=>arr.forEach(x=>out.push(x)));return out.sort((a,b)=>b.c-a.c)})();
+const BNL=L.layerGroup().addTo(map);
+function bLabels(){BNL.clearLayers();const z=map.getZoom();if(z<15||z>16)return;const vb=map.getBounds();const acc=[];const min=z==15?5:3;for(const x of BNG){if(x.c<min||!vb.contains(x.ll))continue;const pt=map.latLngToContainerPoint(x.ll);const w=x.n.length*7.5+10;const bx=[pt.x-w/2,pt.y-10,pt.x+w/2,pt.y+10];if(acc.some(b=>(bx[0]<b[2]&&bx[2]>b[0]&&bx[1]<b[3]&&bx[3]>b[1])||(b[4]===x.n&&Math.hypot(b[5]-pt.x,b[6]-pt.y)<350)))continue;bx.push(x.n,pt.x,pt.y);acc.push(bx);L.marker(x.ll,{interactive:false,keyboard:false,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="bnl">${x.n}</div>`})}).addTo(BNL)}}
+let _mt=null;map.on('moveend',()=>{clearTimeout(_mt);_mt=setTimeout(async()=>{await ensure();roadLabels();labels();bLabels();blds()},60)});window._map=map;window._oc=(k)=>openCard(k,true);
+function restyle(){lay.eachLayer(l=>{const p=l.feature.properties;const v=shown.has(p.k);l.setStyle(v?{...base(p),...(sel===p.k?{weight:2.6,color:'#e85d34',fillOpacity:.9}:{})}:{color:'#d9d5cc',weight:.6,fillColor:'#efece6',fillOpacity:.6});const e=l.getElement&&l.getElement();if(e)e.classList.toggle('sel',sel===p.k)})}
+const US=[0,10,20,30,50,75,100,150,200,300,400,500,700,1000,1500],TS=[0,500,1000,1500,2000,3000,5000,7500,10000,15000,20000,30000,50000],YS=[];for(let y=1950;y<=new Date().getFullYear();y++)YS.push(y);
+const RG={u:{a:US,t:'세대수',f:v=>fmt(v)+'세대',key:'unidades'},t:{a:TS,t:'대지면적',f:v=>fA(v),key:'terreno'},y:{a:YS,t:'준공연도',f:v=>v+'년',key:'ano'}};
+const F={dist:'all',bn:new Set(),u:[0,US.length-1],t:[0,TS.length-1],y:[0,YS.length-1],pad:new Set(),named:false,sort:'unidades'};
+const inRg=(g,v)=>{const A=RG[g].a,[i,j]=F[g];v=v||0;return (i===0||v>=A[i])&&(j===A.length-1||v<=A[j])};
+const rgOn=g=>F[g][0]>0||F[g][1]<RG[g].a.length-1;
+const rgLabel=g=>{const A=RG[g].a,[i,j]=F[g],f=RG[g].f,L=A.length-1;if(i===0&&j===L)return '전체';if(i===0)return (g==='y'?'~':'')+f(A[j])+(g==='y'?'':' 이하');if(j===L)return f(A[i])+(g==='y'?' 이후':' 이상');return f(A[i])+' ~ '+f(A[j])};
+function filt(){const q=$('q').value.trim().toUpperCase();return ALL.filter(p=>(F.dist==='all'||p.dist===F.dist)&&(!F.bn.size||F.bn.has(p.bn))&&(!q||(p.endereco+' '+(p.nome||'')+' '+(p.nome_sub||'')).toUpperCase().includes(q))&&inRg('u',p.unidades)&&inRg('t',p.terreno)&&inRg('y',p.ano)&&(!F.pad.size||F.pad.has(pad(p)))&&(!F.named||p.nome)).sort((a,b)=>b[F.sort]-a[F.sort])}
+const sh=$('sheet');let view='list';
+function setState(s){sh.className=s;document.body.classList.toggle('shid',!s)}
+function title(p){return p.nome||p.endereco}
+function listView(){view='list';const R=filt();shown=new Set(R.map(p=>p.k));restyle();labels();$('cnt').textContent=R.length+'곳';$('stitle').textContent=`단지 ${R.length}곳`;$('back').style.display='none';
+ $('sbody').innerHTML=R.slice(0,300).map(p=>`<div class="it" data-k="${p.k}"><div class="dot" style="background:${col(p)}"></div><div><div class="t">${title(p)}</div><div class="s">${p.dist?p.dist+' · ':''}${p.nome?p.endereco+' · ':''}${p.ano}년 · ${fmt(p.unidades)}세대 · 대지 ${fA(p.terreno)} · ${p.pav_max}층 · 등급 ${pad(p)}</div></div></div>`).join('')||'<p class="note">조건에 맞는 단지가 없습니다.</p>';$('sbody').insertAdjacentHTML('afterbegin','<p class="note" style="margin:0 0 6px">공개 자료 기반 참고용 정보입니다 · <a href="#" class="srcl">자료 출처</a></p>')}
+function typesHTML(p){const T0=(p.tipos||[]).slice().sort((a,b)=>a[0]-b[0]);const T=[];for(const t of T0){const l=T[T.length-1];if(l&&t[0]<=l[2]*1.04){l[1]+=t[1];l[2]=t[0]}else T.push([t[0],t[1],t[0]])}T.forEach(t=>{t[0]=(t[0]+t[2])/2});const mx=Math.max(...T.map(t=>t[1]),1);return T.map(t=>`<div class="ty"><span>약 ${Math.round(t[0]*.5)}~${Math.round(t[0]*.75)}㎡</span><div class="bar"><i style="width:${Math.max(4,t[1]/mx*100)}%"></i></div><span class="n">${fmt(t[1])}세대</span></div>`).join('')}
+
+let UC={},curT=0;async function getU(d){const f='units_'+d.toLowerCase().replace(/ /g,'_')+'.json';if(!UC[f])UC[f]=await fetch(f).then(r=>r.json());return UC[f]}
+const SH=['#dbe7fb','#bcd3f6','#93b6ee','#6b98e3','#4677d2','#2b5bb8','#1c428d'];
+function twHTML(w){if(!w)return '';const M={label:['b-2','시청 대장에 동 표기 있음'],pav:['b-1','대장 층수가 다른 건물이 '+w.t.length+'개 → '+w.t.length+'개 동 추정 · 확인 필요'],mult:['b-1','같은 호수가 '+w.t.length+'번씩 반복 → '+w.t.length+'개 동 추정 · 확인 필요'],single:w.f?['b-1','대장에 동 구분 없음 · 여러 동이거나 넓은 저층 단지일 수 있음 · 확인 필요']:['b-2','대장에 동 구분 없음 · 1개 동으로 추정']};const [c,t]=M[w.s];
+ let h=`<h3 style="margin:10px 0 6px;font-size:15px">동 정보 <small style="font-weight:400;color:var(--sub)">${w.t.length}개 동 · 대장 최고 ${w.p}층</small></h3><span class="badge ${c}">${t}</span>`;
+ if(w.s==='single'&&!w.f)h+=`<p class="note">배치도가 있는 단지로 같은 추정을 검증하면 99%가 실제로 1개 동이었습니다.</p>`;
+ if(w.s==='mult')h+=`<p class="note">동 표기 없이 같은 호수가 반복돼 동 수만 추정했습니다. 동별 세대는 전체를 나눈 값입니다.</p>`;
+ h+=`<table class="tt"><tr><th>동</th><th>세대</th><th>층</th><th>층당 세대</th></tr>${w.t.map(r=>`<tr><td>${r[0]}${r[4]?' <small style="color:var(--sub)">'+r[4]+'년</small>':''}</td><td>${w.s==='mult'?'약 ':''}${r[1]}</td><td>${r[2]?(w.s==='pav'?'대장 ':'')+r[2]+'층':'—'}</td><td>${r[3]||'—'}</td></tr>`).join('')}</table>`;
+ return h}
+function unitsHTML(p,u){if(!u)return '<p class="note">이 단지는 호실 정보가 없습니다.</p>';
+ const all=u.g.flatMap(g=>g[1]);const areas=[...new Set(all.map(r=>r[3]))].sort((a,b)=>a-b);const ci=a=>SH[Math.min(SH.length-1,Math.floor(areas.indexOf(a)*SH.length/Math.max(areas.length,1)))];
+ const grp=[];areas.forEach(a=>{const l=grp[grp.length-1];if(l&&a<=l.hi*1.03){l.hi=a;l.as.push(a)}else grp.push({lo:a,hi:a,as:[a]})});const agg={};all.forEach(r=>{const o=agg[r[3]]||(agg[r[3]]={n:0,pr:new Set()});o.n++;if(r[5])o.pr.add(r[5])});
+ const pe=u.pe,E=pe?pe.e:null,pv=a=>Math.round(a*E);const med=[...all.map(r=>r[3])].sort((x,y)=>x-y)[all.length>>1]||0;
+ let h=pe?(pe.g==='C'?`<span class="badge b-2">전용면적: ${pe.src} 기준으로 단지 보정 · 정확도 C</span>`:`<span class="badge b-1">전용면적: 모델 추정 · 정확도 D</span>`):`<span class="badge b-1">전용면적: 미확보</span>`;
+ if(pe){h+=`<div class="note" style="margin-top:6px;background:#f6f7f9;padding:8px 10px;border-radius:8px"><b>추정 방법</b> · 전용 ≈ 대장 면적 × <b>${Math.round(E*100)}%</b><br>${pe.g==='C'?`이 단지의 ${pe.src} 면적 ÷ 대장 면적으로 구한 비율입니다.`:`주차 따로 등기 <b>${pe.sep?'예':'아니오'}</b> · 1980년 이전 준공 <b>${pe.old?'예':'아니오'}</b> → 광고 면적을 확인한 비슷한 단지 22곳으로 맞춘 비율입니다. 보통 ±6% 안팎, 10곳 중 1곳은 25% 이상 차이 납니다.`}${(pe.fl||[]).includes('big')?'<br>⚠️ 대단지는 공용시설 규모에 따라 오차가 큽니다.':''}${(pe.fl||[]).includes('studio')?'<br>⚠️ 소형 위주 단지는 실제보다 작게 나올 수 있습니다.':''}<br><span style="color:var(--sub)">광고 면적 기준이라 실내면적(área útil)에 가까울 수 있습니다.</span></div>`}
+ h+=`<p class="note">대장 면적 = 전용 + 공용·주차 등 공용부분 지분 (상파울루 재산세법 13조). 대장에는 전용면적 칸이 없어서, 위 방법으로 추정합니다.</p>`;
+ h+=`<table class="tt"><tr><th>대장 면적</th><th>전용(추정)</th><th>세대</th></tr>${grp.map(G=>{const n=G.as.reduce((s,a)=>s+agg[a].n,0);const pr=[...new Set(G.as.flatMap(a=>[...agg[a].pr]))].sort((x,y)=>x-y);return `<tr><td><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${ci(G.lo)};margin-right:6px"></span>${G.lo===G.hi?G.lo:G.lo+'~'+G.hi}㎡</td><td>${E&&pe.kn&&(pe.kn[G.lo]||pe.kn[G.hi])?'<b>'+(pe.kn[G.lo]||pe.kn[G.hi])+'㎡</b> <small style="color:var(--sub)">확인</small>':E?'약 '+(G.lo===G.hi?pv(G.lo):pv(G.lo)+'~'+pv(G.hi))+'㎡'+(G.lo>med*1.6?' <small style="color:var(--warn)">특수</small>':''):'—'}</td><td>${n}</td></tr>`}).join('')}</table>`;
+ if(E&&grp.some(G=>G.lo>med*1.6))h+=`<p class="note">특수: 같은 단지 보통 세대보다 훨씬 큰 세대(최상층·복층 등). 테라스는 대지지분을 낮게 매기는 경우가 많아 실제 전용이 더 클 수 있습니다.</p>`;
+ if(curT>=u.g.length)curT=0;
+ if(u.g.length>1)h+=`<div class="chips" style="margin-top:12px">${u.g.map((g,i)=>`<button class="chip ${i===curT?'on':''}" data-t="${i}">${/^[A-Z0-9]{1,2}$/.test(g[0])?g[0]+'동':g[0]} <small>${g[1].length}</small></button>`).join('')}</div>`;
+ const rows=u.g[curT][1];const ok=rows.filter(r=>r[1]!=null);const lines=[...new Set(ok.map(r=>r[2]))].sort((a,b)=>a-b);const fls=[...new Set(ok.map(r=>r[1]))].sort((a,b)=>b-a);
+ const cell={};ok.forEach(r=>{(cell[r[1]+'_'+r[2]]=cell[r[1]+'_'+r[2]]||[]).push(r)});
+ h+=`<div class="note" style="margin-top:8px">${u.g[curT][0]==='전체'?'':'선택한 동 · '}${fls.length}개 층 × ${lines.length}개 라인 · 호수 규칙: ${u.d===1?'끝 1자리=라인 (예: 52 → 5층 2호 라인)':'끝 2자리=라인 (예: 1203 → 12층 03호 라인)'}</div>`;
+ h+=`<div class="ugw"><table class="ug">${fls.map(f=>`<tr><td class="fl">${f}층</td>${lines.map(l=>{const c=cell[f+'_'+l];if(!c)return '<td class="e"></td>';const r=c[0];return `<td style="background:${ci(r[3])};color:${areas.indexOf(r[3])>areas.length*.6?'#fff':'#1d2433'}" title="${c.map(x=>x[0]+' '+x[3]+'㎡ 지분 '+x[4]+'%').join('\n')}"><b>${r[0]}</b>${c.length>1?' <small>('+c.length+'세대)</small>':''}<br>${r[3]}㎡${E?(pe.kn&&pe.kn[r[3]]?'<br>'+pe.kn[r[3]]+' 확인':'<br>≈'+pv(r[3])):''}</td>`}).join('')}</tr>`).join('')}</table></div>`;
+ const bad=rows.filter(r=>r[1]==null);if(bad.length)h+=`<p class="note">호수를 읽지 못한 ${bad.length}세대: ${bad.slice(0,8).map(r=>r[0]+' '+r[3]+'㎡').join(', ')}${bad.length>8?' …':''}</p>`;
+ if(u.dup)h+=`<p class="note" style="color:var(--warn)">대장에 동 구분 없이 같은 호수가 여러 번 나와서, 같은 호수 세대를 한 칸에 모았습니다(괄호 안 세대 수). 동별로 나누려면 현장 확인이 필요합니다.</p>`;
+ return h}
+async function fillUnits(k){const P0=ALL.find(x=>x.k===k);const u=(await getU(P0.dist))[k];const el=$('ux');if(el&&view==='card'&&sel===k){el.innerHTML=unitsHTML(ALL.find(x=>x.k===k),u);const tx=$('twx');if(tx)tx.innerHTML=twHTML(u&&u.tw)}}
+function card(p){const [bc,bt]=conf(p);const g=pad(p);const age=Y-p.ano;
+ const tw='';
+ return `<h2 class="nm">${title(p)}</h2><div class="addr">${p.nome?p.endereco+' · ':''}${p.bairro?p.bairro+' · ':''}${p.dist||''}</div>
+ <span class="badge ${bc}" title="${(p.nome_src||'').replace(/"/g,'')}">${bt}</span>${p.nome_sub?`<div class="note">함께 쓰이는 이름: ${p.nome_sub}</div>`:''}${(p.nome_src||'').includes('불일치')?`<div class="note" style="color:var(--warn)">${p.nome_src}</div>`:''}
+ <div class="stats"><div><b>${p.ano}</b><span>준공 · ${age}년차</span></div><div><b>${fmt(p.unidades)}</b><span>세대</span></div><div><b>${p.pav_max}층</b><span>최고층</span></div><div><b>${g}</b><span>${PAD[g]||'등급'}</span></div></div>
+ <div class="sec">호실별 면적 <small>재산세 대장 기준</small></div><div id="ux"><p class="note">불러오는 중…</p></div>
+ <div class="sec">동 배치도 <small>약식</small></div><div class="plan">${plan(p)}</div><div id="twx"></div>${tw}
+ <div class="sec">아직 없는 정보</div><div class="todo"><span>출입구 위치</span><span>편의시설</span><span>경비 형태</span><span>관리비</span><span>현장 사진</span></div>
+ <div class="sec">기본 정보</div><div class="kv"><span>대지면적</span><span>${fmt(p.terreno)}㎡</span></div>${p.garagens?`<div class="kv"><span>주차 별도 등기</span><span>${fmt(p.garagens)}개</span></div>`:''}${p.outras?`<div class="kv"><span>비주거(상가 등)</span><span>${fmt(p.outras)}개</span></div>`:''}<div class="kv"><span>건물 등급</span><span>${g} (A 낮음 ~ F 최고급, 세금 기준)</span></div><div class="kv"><span>대장 번호</span><span>${p.k}</span></div>
+ <p class="note">출처: 상파울루시 재산세(IPTU) 대장 2026, 시청 필지·건물 지도(GeoSampa). 전용면적은 분양자료·확인된 광고가 있는 경우에만 표시. 이름 출처: ${p.nome_src||'없음'}.</p>`}
+async function openCard(k,fly){const p=ALL.find(x=>x.k===k);if(!p)return;await loadDist(p.dist);view='card';sel=k;restyle();$('stitle').textContent='단지 정보';$('back').style.display='';curT=0;$('sbody').innerHTML=card(p);$('sbody').scrollTop=0;fillUnits(k);setState(window.innerWidth>=900?'full':'peek');
+ const l=layers[k];if(l&&fly){map.fitBounds(l.getBounds(),{maxZoom:18,paddingBottomRight:[0,window.innerWidth<900?220:0],paddingTopLeft:[window.innerWidth>=900?420:0,60]})}}
+function filterView(){view='filter';$('stitle').textContent='필터';$('back').style.display='';const ch=(g,v,t,on)=>`<button class="chip ${on?'on':''}" data-g="${g}" data-v="${v}">${t}</button>`;
+ const dn=d=>d==='Vila Andrade'?'Vila Andrade (Panamby)':d==='Saude'?'Saúde':d;
+ let bnh='';if(F.dist!=='all'){const c={};ALL.forEach(p=>{if(p.dist===F.dist)c[p.bn]=(c[p.bn]||0)+1});bnh=`<div class="flab">동네 <small style="color:#8a92a3">(여러 개 선택 · 재산세 대장 주소 기준)</small></div><div class="chips">${Object.entries(c).sort((a,b)=>b[1]-a[1]).map(([b,n])=>ch('bn',b,`${b} <small>${n}</small>`,F.bn.has(b))).join('')}</div>`}
+ const sl=(g,pre)=>{const A=RG[g].a;return `<div class="flab">${RG[g].t} <b class="rv" id="rv_${g}">${rgLabel(g)}</b></div><div class="chips">${pre.map(x=>ch('pre_'+g,x[0]+','+x[1],x[2],F[g][0]===x[0]&&F[g][1]===x[1])).join('')}</div><div class="rs" data-g="${g}"><div class="rtrack"><i id="rf_${g}"></i></div><input type="range" min="0" max="${A.length-1}" step="1" value="${F[g][0]}" data-g="${g}" data-e="0"><input type="range" min="0" max="${A.length-1}" step="1" value="${F[g][1]}" data-g="${g}" data-e="1"></div>`};
+ const L1=US.length-1,L2=TS.length-1,L3=YS.length-1,yi=y=>YS.indexOf(y);
+ $('sbody').innerHTML=`<div class="flab">지역</div><div class="chips">${[['all','전체'],...Object.keys(DM).sort().map(d=>[d,dn(d)])].map(x=>ch('dist',x[0],x[1],F.dist===x[0])).join('')}</div>${bnh}
+ ${sl('u',[[0,L1,'전체'],[US.indexOf(50),L1,'50+'],[US.indexOf(100),L1,'100+'],[US.indexOf(300),L1,'300+']])}
+ ${sl('t',[[0,L2,'전체'],[TS.indexOf(5000),L2,'5천㎡+'],[TS.indexOf(10000),L2,'1만㎡+'],[TS.indexOf(20000),L2,'2만㎡+']])}<div class="note" style="margin:-4px 0 4px">대지면적이 넓을수록 클럽형 시설이 잘 갖춰진 경우가 많습니다.</div>
+ ${sl('y',[[0,L3,'전체'],[yi(2015),L3,'2015~'],[yi(2000),yi(2014),'2000~14'],[0,yi(1999),'~1999']])}
+ <div class="flab">건물 등급 (여러 개 선택)</div><div class="chips">${'BCDEF'.split('').map(x=>ch('pad',x,x+' '+PAD[x],F.pad.has(x))).join('')}</div>
+ <div class="flab">이름</div><div class="chips">${ch('named',1,'이름 있는 단지만',F.named)}</div>
+ <div class="flab">정렬</div><div class="chips">${[['unidades','세대수'],['terreno','대지면적'],['ano','최신 준공'],['pav_max','높은 층']].map(x=>ch('sort',x[0],x[1],F.sort===x[0])).join('')}</div>
+ <div style="display:flex;gap:8px;margin-top:14px"><button class="iconbtn" id="reset" style="flex:0 0 auto">초기화</button><button class="iconbtn on" style="flex:1" id="apply">목록 보기 (${filt().length}곳)</button></div>`;['u','t','y'].forEach(rfill);setState('full')}
+function rfill(g){const A=RG[g].a,[i,j]=F[g],el=$('rf_'+g);if(!el)return;el.style.left=(i/(A.length-1)*100)+'%';el.style.right=(100-j/(A.length-1)*100)+'%';$('rv_'+g).textContent=rgLabel(g)}
+let _at=null;function applyF(now){clearTimeout(_at);const go=()=>{const R=filt();shown=new Set(R.map(p=>p.k));restyle();labels();bLabels();$('cnt').textContent=R.length+'곳';const ap=$('apply');if(ap)ap.textContent=`목록 보기 (${R.length}곳)`;$('fbtn').classList.toggle('on',fOn())};now?go():_at=setTimeout(go,120)}
+function fOn(){return F.dist!=='all'||F.bn.size||rgOn('u')||rgOn('t')||rgOn('y')||F.pad.size||F.named}
+$('sbody').addEventListener('input',e=>{const t=e.target;if(t.type!=='range')return;const g=t.dataset.g,ix=+t.dataset.e;let v=+t.value;if(ix===0&&v>F[g][1])v=F[g][1];if(ix===1&&v<F[g][0])v=F[g][0];t.value=v;F[g][ix]=v;rfill(g);applyF();document.querySelectorAll(`.chip[data-g="pre_${g}"]`).forEach(c=>c.classList.toggle('on',c.dataset.v===F[g].join(',')))});
+$('sbody').addEventListener('click',e=>{const tb=e.target.closest('[data-t]');if(tb){curT=+tb.dataset.t;fillUnits(sel);return}const it=e.target.closest('.it');if(it){openCard(it.dataset.k,true);return}const c=e.target.closest('.chip');if(c){const g=c.dataset.g,v=c.dataset.v;const sc=$('sbody').scrollTop;if(g==='pad'){F.pad.has(v)?F.pad.delete(v):F.pad.add(v)}else if(g==='bn'){F.bn.has(v)?F.bn.delete(v):F.bn.add(v)}else if(g==='named')F.named=!F.named;else if(g.startsWith('pre_')){F[g.slice(4)]=v.split(',').map(Number)}else if(g==='dist'){F.dist=v;F.bn.clear()}else F[g]=v;filterView();$('sbody').scrollTop=sc;applyF(1);return}if(e.target.id==='reset'){F.dist='all';F.bn.clear();F.u=[0,US.length-1];F.t=[0,TS.length-1];F.y=[0,YS.length-1];F.pad.clear();F.named=false;filterView();applyF(1);return}if(e.target.id==='apply'){listView();setState(window.innerWidth>=900?'full':'peek')}});
+$('q').addEventListener('input',()=>{listView();if(sh.className==='')setState('peek')});
+$('fbtn').onclick=()=>(view==='filter'&&sh.className)?(listView(),setState(window.innerWidth>=900?'full':'peek')):filterView();
+$('listbtn').onclick=()=>{if(view!=='list')listView();setState('full')};
+$('back').onclick=()=>{sel=null;listView();setState(window.innerWidth>=900?'full':'peek')};
+$('close').onclick=()=>{sel=null;if(view!=='list')listView();else restyle();setState('')};
+let y0=null,st0='';const g=$('grab');g.addEventListener('pointerdown',e=>{y0=e.clientY;st0=sh.className});addEventListener('pointerup',e=>{if(y0===null)return;const d=e.clientY-y0;y0=null;if(Math.abs(d)<8){setState(st0==='full'?'peek':'full');return}if(d<-40)setState('full');else if(d>40)setState(st0==='full'?'peek':'')});
+legend();listView();setState(window.innerWidth>=900?'full':'peek');
+function plan(p){const B=LY.lay[p.k];if(!B){return `<div style="margin:6px 0;padding:6px;background:#fff6e5;font-size:11px;color:#a60">동 배치도 없음 — ${LY.bad[p.k]!==undefined?'시청 건물 자료(2007년 촬영·2014년 갱신)가 현재 건물과 맞지 않음':'시청 건물 자료에 이 단지 건물이 없음'}. 아래 <b>동 정보</b>는 재산세 대장 기준입니다.</div>`}
+const T=b=>b.h>=Math.max(9,p.pav_max*1.35);const G=GEO[p.k];const rings=G?(G.type==='Polygon'?[G.coordinates[0]]:G.coordinates.map(c=>c[0])):[];const pts=rings.flat().concat(B.flatMap(b=>b.g));
+const lat0=pts.reduce((a,c)=>a+c[1],0)/pts.length,kx=Math.cos(lat0*Math.PI/180);const xs=pts.map(c=>c[0]*kx),ys=pts.map(c=>c[1]);
+const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);const W=270,H=190,pad=8;const sc=Math.min((W-2*pad)/(x1-x0||1e-9),(H-2*pad)/(y1-y0||1e-9));
+const P=c=>[(pad+(c[0]*kx-x0)*sc).toFixed(1),(H-pad-(c[1]-y0)*sc).toFixed(1)];const path=r=>'M'+r.map(c=>P(c).join(',')).join('L')+'Z';
+const m=111320*sc/1;let sb=10;for(const v of [10,20,50,100])if(v*sc/111320*1<=W/3)sb=v;const sbp=sb/111320*sc;
+let s=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="background:#fafafa;border:1px solid #e6e8ee;display:block;margin:6px 0">`+rings.map(r=>`<path d="${path(r)}" fill="#eef5e9" stroke="#7a9a6a" stroke-dasharray="3,2"/>`).join('');
+let n=0;const lab=[];for(const b of [...B].sort((a,c)=>T(a)-T(c))){s+=`<path d="${path(b.g)}" fill="${T(b)?'#3b4a6b':'#c9c9c9'}" stroke="#555" stroke-width=".5"/>`;if(T(b)){n++;const c=b.g.reduce((a,v)=>[a[0]+v[0]/b.g.length,a[1]+v[1]/b.g.length],[0,0]);const q=P(c);lab.push(`<text x="${q[0]}" y="${q[1]}" font-size="9" font-weight="700" fill="#fff" text-anchor="middle" dominant-baseline="middle">${n}</text>`)}}
+s+=lab.join('')+`<line x1="${W-pad-sbp}" y1="${H-5}" x2="${W-pad}" y2="${H-5}" stroke="#333"/><text x="${W-pad}" y="${H-8}" font-size="8" text-anchor="end">${sb}m</text><text x="${pad}" y="${pad+6}" font-size="9">N↑</text></svg>`;
+return `<div class="note">주거동 추정 ${n}개 (번호는 그림용, 실제 동 이름과 무관)</div>${p.torres&&p.torres.length&&p.torres.length!==n?`<div style="font-size:11px;color:#a60">대장 동 수(${p.torres.length})와 그림 속 타워 수(${n})가 다름 — 데이터 누락·병합 가능, 현장 확인 필요</div>`:''}`+s+`<div style="font-size:10px;color:#999">진한 색=주거동 추정, 회색=저층 부속건물, 점선=필지 경계. 출처: 시청 건물 윤곽(2007 촬영·2014 갱신). 출입구 위치는 미확인.</div>`}
+
+})();</script>
+</body></html>
